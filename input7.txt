@@ -592,4 +592,3 @@ muted salmon bags contain 4 faded brown bags, 1 dotted black bag, 5 muted black 
 bright purple bags contain 5 shiny red bags, 5 vibrant cyan bags, 4 plaid cyan bags, 5 bright silver bags.
 dim chartreuse bags contain 1 faded indigo bag.
 drab purple bags contain 4 muted cyan bags, 3 wavy lavender bags, 2 dotted blue bags.
-
