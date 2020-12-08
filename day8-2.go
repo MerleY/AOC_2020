@@ -7,6 +7,7 @@ import (
     "bufio"
     "strings"
     "strconv"
+    "time"
 )
 
 type Instruction struct {
@@ -29,6 +30,8 @@ func (instr Instruction) run(indice int, acc int) (int, int) {
 }
 
 func main() {
+    start := time.Now()
+
     file, err := os.Open("input8.txt")
     if err != nil {
         log.Fatal(err)
@@ -68,6 +71,8 @@ func main() {
         answ, ter = runPile(pile_)
     }
     fmt.Println(answ)
+
+    fmt.Println("Execution duration: " + time.Now().Sub(start).String())
 }
 
 func updatePile(pile []Instruction, ind int) []Instruction {
