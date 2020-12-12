@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-    passports := input.Load(4).ToStringByGroupArray()
+    passports := input.Load(4).ToSpaceConcatenateStringArray()
     var mandatoryFields = []string{"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}
     valid := 0
 

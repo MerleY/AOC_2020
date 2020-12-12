@@ -19,6 +19,15 @@ func IntIn(a int, list []int) bool {
     return false
 }
 
+func ByteIn(a byte, list []byte) bool {
+    for _, b := range list {
+        if b == a {
+            return true
+        }
+    }
+    return false
+}
+
 func IntMax(list []int) int {
     var max int
     for i, b := range list {
