@@ -2,12 +2,11 @@ package main
 
 import (
     "fmt"
-    "os"
-    "log"
-    "bufio"
     "strings"
     "regexp"
     "strconv"
+    "aoc/input"
+    "aoc/arrays"
 )
 
 type InsideBag struct {
@@ -15,20 +14,9 @@ type InsideBag struct {
 }
 
 func main() {
-    file, err := os.Open("input7.txt")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer func() {
-        if err = file.Close(); err != nil {
-            log.Fatal(err)
-        }
-    }()
-
-    scanner := bufio.NewScanner(file)
+    inputs := input.Load(7).ToStringArray()
     bags := make(map[string]InsideBag)
-    for scanner.Scan() {
-        input := scanner.Text()
+    for _, input := range inputs {
         parts := strings.Split(input, " bags contain ")
         bagColor := parts[0]
         bags[bagColor] = InsideBag{inside: make(map[string]int)}
@@ -43,8 +31,8 @@ func main() {
             bags[bagColor].inside[color] = nbrBags
         }
     }
-    fmt.Println(countContainOut(bags, "shiny gold"))
-    fmt.Println(countContainIn(bags, "shiny gold"))
+    fmt.Printf("Star 1 : %v\n", countContainOut(bags, "shiny gold"))
+    fmt.Printf("Star 2 : %v\n", countContainIn(bags, "shiny gold"))
 }
 func countContainIn(bags map[string]InsideBag, chosenColor string) int {
     total := 0
@@ -61,7 +49,7 @@ func countContainOut(bags map[string]InsideBag, chosenColor string) int {
         var newBags []string
         for color, insideBags := range bags {
             for _, collectBag := range collectBags {
-                if insideBags.inside[collectBag] != 0 && !stringInSlice(collectBags, color) && !stringInSlice(newBags, color){
+                if insideBags.inside[collectBag] != 0 && !arrays.StringIn(color, collectBags) && !arrays.StringIn(color, newBags){
                     newBags = append(newBags, color)
                 }
             }
@@ -74,13 +62,4 @@ func countContainOut(bags map[string]InsideBag, chosenColor string) int {
     }
 
     return len(collectBags) - 1
-}
-
-func stringInSlice(list []string, a string) bool {
-    for _, b := range list {
-        if b == a {
-            return true
-        }
-    }
-    return false
 }

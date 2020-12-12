@@ -57,7 +57,7 @@ func (c Content) ToStringArray() []string {
     return c.lines
 }
 
-func (c Content) ToStringByGroupArray() []string {
+func (c Content) ToSpaceConcatenateStringArray() []string {
     var groupedLines []string
     var group string
     for _, line := range c.lines {
@@ -66,6 +66,22 @@ func (c Content) ToStringByGroupArray() []string {
             group = ""
         } else {
             group += " " + line
+        }
+    }
+    groupedLines = append(groupedLines, group)
+
+    return groupedLines
+}
+
+func (c Content) ToDoubleStringGroupedArray() [][]string {
+    var groupedLines [][]string
+    var group []string
+    for _, line := range c.lines {
+        if line == "" {
+            groupedLines = append(groupedLines, group)
+            group = []string{}
+        } else {
+            group = append(group, line)
         }
     }
     groupedLines = append(groupedLines, group)
