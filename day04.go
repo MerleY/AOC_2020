@@ -1,38 +1,38 @@
 package main
 
-import "fmt"
-import "os"
-import "bufio"
-import "log"
-import "strings"
-import "strconv"
-import "regexp"
+import (
+    "fmt"
+    "strings"
+    "strconv"
+    "regexp"
+    "aoc/input"
+    "aoc/arrays"
+)
 
 func main() {
-    file, err := os.Open("input4.txt")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer func() {
-        if err = file.Close(); err != nil {
-            log.Fatal(err)
-        }
-    }()
-
-    scanner := bufio.NewScanner(file)
-    var passports []string
-    line := ""
-    for scanner.Scan() {
-        input := scanner.Text()
-        if input == "" {
-            passports = append(passports, line)
-            line = ""
-        } else {
-            line = line + " " + input
-        }
-    }
+    passports := input.Load(4).ToStringByGroupArray()
     var mandatoryFields = []string{"byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"}
     valid := 0
+
+    // part 1
+    for _, passport := range passports {
+        var elements = strings.Split(passport, " ")
+        var presentFields []string
+        for _, element := range elements {
+            var keyValue = strings.Split(element, ":")
+            key := keyValue[0]
+            if arrays.StringIn(key, mandatoryFields) && !arrays.StringIn(key, presentFields){
+                presentFields = append(presentFields, key)
+            }
+        }
+        if (len(presentFields) > 6) {
+            valid++
+        }
+    }
+    fmt.Printf("Star 1 : %v\n", valid)
+
+    // part 2
+    valid = 0
     for _, passport := range passports {
         var elements = strings.Split(passport, " ")
         var presentFields []string
@@ -42,25 +42,15 @@ func main() {
             }
             var keyValue = strings.Split(element, ":")
             key := keyValue[0]
-            if isValid(keyValue) && stringInSlice(mandatoryFields, key) && !stringInSlice(presentFields, key){
+            if isValid(keyValue) && arrays.StringIn(key, mandatoryFields) && !arrays.StringIn(key, presentFields){
                 presentFields = append(presentFields, key)
             }
         }
-        fmt.Println(presentFields)
         if (len(presentFields) > 6) {
             valid++
         }
     }
-    fmt.Println(valid)
-}
-
-func stringInSlice(list []string, a string) bool {
-    for _, b := range list {
-        if b == a {
-            return true
-        }
-    }
-    return false
+    fmt.Printf("Star 2 : %v\n", valid)
 }
 
 func isValid(keyValue []string) bool {
@@ -95,7 +85,6 @@ func isValid(keyValue []string) bool {
             }
         }
     case "hcl":
-        fmt.Println(value)
         matched, _ := regexp.Match(`^#(\d|[a-f]){6}$`, []byte(value))
         if matched {
             return true

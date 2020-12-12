@@ -52,6 +52,23 @@ func (c Content) ToIntArray() []int {
 
     return intArray
 }
+
 func (c Content) ToStringArray() []string {
     return c.lines
+}
+
+func (c Content) ToStringByGroupArray() []string {
+    var groupedLines []string
+    var group string
+    for _, line := range c.lines {
+        if line == "" {
+            groupedLines = append(groupedLines, group)
+            group = ""
+        } else {
+            group += " " + line
+        }
+    }
+    groupedLines = append(groupedLines, group)
+
+    return groupedLines
 }
