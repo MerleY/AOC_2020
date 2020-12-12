@@ -2,131 +2,51 @@ package main
 
 import (
     "fmt"
-    "os"
-    "log"
-    "bufio"
-    "strconv"
     "time"
     "sort"
+    "aoc/input"
 )
 
 
 func main() {
     start := time.Now()
-    lines := getFileContent("inputs/input10.txt")
-    input := transform(lines)
-    sort.Ints(input)
+    inputs := input.Load(10).ToIntArray()
+    sort.Ints(inputs)
 
+    // part 1
     jolt := 0
     three_joltDelta := 1
     one_joltDelta := 0
-    for i := 0; i < len(input); i++ {
-        if input[i] == jolt + 1 {
+    for i := 0; i < len(inputs); i++ {
+        if inputs[i] == jolt + 1 {
             jolt++
             one_joltDelta++
         }
-        if input[i] == jolt + 3 {
+        if inputs[i] == jolt + 3 {
             three_joltDelta++
         }
-        jolt = input[i] 
+        jolt = inputs[i]
     }
-    fmt.Println(one_joltDelta * three_joltDelta)
+    fmt.Printf("Star 1: %v\n", one_joltDelta * three_joltDelta)
+
+    // part 2
+    possArrang := make([]int, len(inputs))
+    for i := 0; i <= 3; i++ {
+        if inputs[i] <= 3{
+            possArrang[i] = 1
+        }
+    }
+
+    for i := 0; i < len(inputs); i++ {
+        for j := 1; j <= 3; j++ {
+            if i + j < len(inputs) {
+                if inputs[i + j] <= inputs[i] + 3 {
+                    possArrang[i + j] += possArrang[i]
+                }
+            }
+        }
+    }
+    fmt.Printf("Star 2: %v\n", possArrang[len(possArrang) - 1])
+
     fmt.Println("Execution duration: " + time.Now().Sub(start).String())
-}
-
-func findConsecutivSum(table []int, ind int) []int{
-    for start := 0; start < ind; start++ {
-        sum := table[start]
-        for i := start + 1; i < ind; i++ {
-            sum += table[i]
-            if sum > table[ind] {
-                break
-            }
-            if sum == table[ind] {
-                return table[start:i]
-            }
-        }
-    }
-    return nil
-}
-
-func sumOfTwoBefore(table []int, sum int) bool {
-    if (len(table) != 25) {
-        log.Fatal("Table length invalid")
-    }
-    for i, a := range table {
-        for _, b := range table[i:] {
-            if a + b == sum {
-                return true
-            }
-        }
-    }
-
-    return false
-}
-
-func intInSlice(list []int, a int) bool {
-    for _, b := range list {
-        if b == a {
-            return true
-        }
-    }
-    return false
-}
-
-func min(list []int) int{
-    var min int
-    for i, b := range list {
-        if i == 0 {
-            min = b
-        } else if (b < min) {
-            min = b
-        }
-    }
-    return min
-}
-
-func max(list []int) int{
-    var max int
-    for i, b := range list {
-        if i == 0 {
-            max = b
-        } else if (b > max) {
-            max = b
-        }
-    }
-    return max
-}
-
-func transform (lines []string) []int {
-    var numbers []int
-    for i, line := range lines {
-        n, err := strconv.Atoi(line)
-        if err != nil {
-            log.Fatal("Could not convert line " + string(i))
-        }
-        numbers = append(numbers, n)
-    }
-
-    return numbers
-}
-
-func getFileContent(name string) []string {
-    var lines []string
-    file, err := os.Open(name)
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer func() {
-        if err = file.Close(); err != nil {
-            log.Fatal(err)
-        }
-    }()
-    scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
-        input := scanner.Text()
-        lines = append(lines, input)
-    }
-
-    return lines
 }

@@ -39,3 +39,15 @@ func IntMax(list []int) int {
     }
     return max
 }
+
+func IntMin(list []int) int {
+    var min int
+    for i, b := range list {
+        if i == 0 {
+            min = b
+        } else if b < min{
+            min = b
+        }
+    }
+    return min
+}
