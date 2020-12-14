@@ -1,0 +1,127 @@
+package main
+
+import (
+	"aoc/input"
+	"fmt"
+	"log"
+	"math"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+)
+
+type Instruction struct {
+	mask   string
+	values map[uint64]uint64
+}
+
+func reverse(s string) string {
+	rns := []rune(s)
+	for i, j := 0, len(rns)-1; i < j; i, j = i+1, j-1 {
+		rns[i], rns[j] = rns[j], rns[i]
+	}
+
+	return string(rns)
+}
+
+func (i Instruction) update(memory map[uint64]uint64) {
+	for location, value := range i.values {
+		mask1, err := strconv.ParseUint(strings.Replace(i.mask, "X", "0", -1), 2, 64)
+		mask2, err2 := strconv.ParseUint(strings.Replace(i.mask, "X", "1", -1), 2, 64)
+		if err != nil || err2 != nil {
+			log.Fatal("Error while converting to int")
+		}
+		newValue := value | mask1
+		newValue &= mask2
+		memory[location] = newValue
+	}
+}
+
+func (i Instruction) update2(memory map[uint64]uint64) {
+	for location, value := range i.values {
+		mask1, err := strconv.ParseUint(strings.Replace(i.mask, "X", "0", -1), 2, 64)
+		if err != nil {
+			log.Fatal("Error while converting to int")
+		}
+		newlocation := location | mask1
+		var locations []uint64
+		locations = append(locations, newlocation)
+		for i, x := range reverse(i.mask) {
+			if x == []rune("X")[0] {
+				var newLocations []uint64
+				for _, location := range locations {
+					newlocation = uint64(location ^ uint64(math.Pow(2, float64(i))))
+					newLocations = append(newLocations, newlocation)
+				}
+				locations = append(locations, newLocations...)
+			}
+		}
+		for _, location := range locations {
+			memory[location] = value
+		}
+	}
+}
+
+func main() {
+	start := time.Now()
+	inputs := input.Load(14).ToStringArray()
+	instructions := convertInputToMaskAndMemory(inputs)
+
+	// part 1
+	var memory = make(map[uint64]uint64)
+	for _, instruction := range instructions {
+		instruction.update(memory)
+	}
+	var star1 uint64
+	for _, v := range memory {
+		star1 += v
+	}
+	fmt.Printf("Star 1: %v\n", star1)
+
+	// part 2
+	memory = make(map[uint64]uint64)
+	for _, instruction := range instructions {
+		instruction.update2(memory)
+	}
+
+	var star2 uint64
+	for _, v := range memory {
+		star2 += v
+	}
+	fmt.Printf("Star 2: %v\n", star2)
+	//4173794505294
+	//4202134630820
+
+	fmt.Println("Execution duration: " + time.Now().Sub(start).String())
+}
+
+func convertInputToMaskAndMemory(inputs []string) []Instruction {
+	var instructions []Instruction
+	var instruc = Instruction{}
+	for _, line := range inputs {
+		var splits = strings.Split(line, "=")
+		if strings.Contains(splits[0], "mask") {
+			if instruc.mask != "" {
+				instructions = append(instructions, instruc)
+				instruc = Instruction{}
+			}
+			instruc.mask = strings.Trim(splits[1], " ")
+		} else {
+			re := regexp.MustCompile(`(mem\[(\d+)\])`)
+			matched := re.FindAllStringSubmatch(splits[0], -1)
+			location, err := strconv.Atoi(matched[0][2])
+			value, err2 := strconv.Atoi(strings.Trim(splits[1], " "))
+			if err != nil || err2 != nil {
+				log.Fatal("Error while parsing input")
+			}
+			if instruc.values == nil {
+				instruc.values = make(map[uint64]uint64)
+			}
+			instruc.values[uint64(location)] = uint64(value)
+		}
+	}
+	instructions = append(instructions, instruc)
+
+	return instructions
+}
