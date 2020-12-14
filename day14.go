@@ -12,8 +12,12 @@ import (
 )
 
 type Instruction struct {
-	mask   string
-	values map[uint64]uint64
+	mask string
+	data []pair
+}
+type pair struct {
+	adress uint64
+	value  uint64
 }
 
 func reverse(s string) string {
@@ -26,25 +30,25 @@ func reverse(s string) string {
 }
 
 func (i Instruction) update(memory map[uint64]uint64) {
-	for location, value := range i.values {
+	for _, pair := range i.data {
 		mask1, err := strconv.ParseUint(strings.Replace(i.mask, "X", "0", -1), 2, 64)
 		mask2, err2 := strconv.ParseUint(strings.Replace(i.mask, "X", "1", -1), 2, 64)
 		if err != nil || err2 != nil {
 			log.Fatal("Error while converting to int")
 		}
-		newValue := value | mask1
+		newValue := pair.value | mask1
 		newValue &= mask2
-		memory[location] = newValue
+		memory[pair.adress] = newValue
 	}
 }
 
 func (i Instruction) update2(memory map[uint64]uint64) {
-	for location, value := range i.values {
+	for _, pair := range i.data {
 		mask1, err := strconv.ParseUint(strings.Replace(i.mask, "X", "0", -1), 2, 64)
 		if err != nil {
 			log.Fatal("Error while converting to int")
 		}
-		newlocation := location | mask1
+		newlocation := pair.adress | mask1
 		var locations []uint64
 		locations = append(locations, newlocation)
 		for i, x := range reverse(i.mask) {
@@ -58,7 +62,7 @@ func (i Instruction) update2(memory map[uint64]uint64) {
 			}
 		}
 		for _, location := range locations {
-			memory[location] = value
+			memory[location] = pair.value
 		}
 	}
 }
@@ -90,8 +94,6 @@ func main() {
 		star2 += v
 	}
 	fmt.Printf("Star 2: %v\n", star2)
-	//4173794505294
-	//4202134630820
 
 	fmt.Println("Execution duration: " + time.Now().Sub(start).String())
 }
@@ -115,10 +117,7 @@ func convertInputToMaskAndMemory(inputs []string) []Instruction {
 			if err != nil || err2 != nil {
 				log.Fatal("Error while parsing input")
 			}
-			if instruc.values == nil {
-				instruc.values = make(map[uint64]uint64)
-			}
-			instruc.values[uint64(location)] = uint64(value)
+			instruc.data = append(instruc.data, pair{adress: uint64(location), value: uint64(value)})
 		}
 	}
 	instructions = append(instructions, instruc)
