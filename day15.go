@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
 type Positions struct {
@@ -41,8 +40,6 @@ func (c *Collection) add() {
 }
 
 func day15() {
-	start := time.Now()
-
 	// part 1
 	startingNumbers := []int{1, 20, 11, 6, 12, 0}
 	collection := Collection{history: make(map[int]Positions)}
@@ -66,6 +63,4 @@ func day15() {
 			fmt.Printf("Star 2: %v\n", collection.lastValue)
 		}
 	}
-
-	fmt.Println("Execution duration: " + time.Now().Sub(start).String())
 }

@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type MaskedData struct {
@@ -68,7 +67,6 @@ func (i MaskedData) update2(memory map[uint64]uint64) {
 }
 
 func day14() {
-	start := time.Now()
 	inputs := input.Load("14").ToStringArray()
 	instructions := convertInputToMaskAndMemory(inputs)
 
@@ -94,8 +92,6 @@ func day14() {
 		star2 += v
 	}
 	fmt.Printf("Star 2: %v\n", star2)
-
-	fmt.Println("Execution duration: " + time.Now().Sub(start).String())
 }
 
 func convertInputToMaskAndMemory(inputs []string) []MaskedData {

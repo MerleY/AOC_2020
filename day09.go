@@ -5,11 +5,9 @@ import (
 	"aoc/input"
 	"fmt"
 	"log"
-	"time"
 )
 
 func day09() {
-	start := time.Now()
 	inputs := input.Load("9").ToIntArray()
 	block := 25
 	var encodErr int
@@ -23,8 +21,6 @@ func day09() {
 	fmt.Printf("Star 1 : %v\n", inputs[encodErr])
 	consecNum := findConsecutivSum(inputs, encodErr)
 	fmt.Printf("Star 2 : %v\n", arrays.IntMin(consecNum)+arrays.IntMax(consecNum))
-
-	fmt.Println("Execution duration: " + time.Now().Sub(start).String())
 }
 
 func findConsecutivSum(table []int, ind int) []int {

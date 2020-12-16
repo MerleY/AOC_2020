@@ -4,11 +4,9 @@ import (
 	"aoc/input"
 	"fmt"
 	"sort"
-	"time"
 )
 
 func day10() {
-	start := time.Now()
 	inputs := input.Load("10").ToIntArray()
 	sort.Ints(inputs)
 
@@ -46,6 +44,4 @@ func day10() {
 		}
 	}
 	fmt.Printf("Star 2: %v\n", possArrang[len(possArrang)-1])
-
-	fmt.Println("Execution duration: " + time.Now().Sub(start).String())
 }

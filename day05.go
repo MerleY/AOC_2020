@@ -21,7 +21,7 @@ func day05() {
 
 		id = 0
 		for i, letter := range input {
-			if letter == 'B' {
+			if letter == 'B' || letter == 'R' {
 				id += int(math.Pow(2, float64(9-i)))
 			}
 		}

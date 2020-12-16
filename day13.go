@@ -6,7 +6,6 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type shuttle struct {
@@ -15,7 +14,6 @@ type shuttle struct {
 }
 
 func day13() {
-	start := time.Now()
 	inputs := input.Load("13").ToStringArray()
 
 	earliestDepart, err := strconv.Atoi(inputs[0])
@@ -62,6 +60,4 @@ func day13() {
 		}
 	}
 	fmt.Printf("Star 2: %v\n", startTime)
-
-	fmt.Println("Execution duration: " + time.Now().Sub(start).String())
 }
