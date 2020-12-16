@@ -40,7 +40,7 @@ func (c *Collection) add() {
 	c.lastValue = diff
 }
 
-func main() {
+func day15() {
 	start := time.Now()
 
 	// part 1

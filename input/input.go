@@ -11,9 +11,8 @@ type Content struct {
 	lines []string
 }
 
-func Load(numFile int) Content {
-	numFileString := strconv.Itoa(numFile)
-	file, err := os.Open("inputs/input" + numFileString + ".txt")
+func Load(numFile string) Content {
+	file, err := os.Open("inputs/input" + numFile + ".txt")
 	if err != nil {
 		log.Fatal(err)
 	}

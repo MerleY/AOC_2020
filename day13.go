@@ -14,9 +14,9 @@ type shuttle struct {
 	id     int
 }
 
-func main() {
+func day13() {
 	start := time.Now()
-	inputs := input.Load(13).ToStringArray()
+	inputs := input.Load("13").ToStringArray()
 
 	earliestDepart, err := strconv.Atoi(inputs[0])
 	if err != nil {

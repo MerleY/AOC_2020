@@ -26,9 +26,9 @@ type field struct {
 	possibleValues []bound
 }
 
-func main() {
+func day16() {
 	start := time.Now()
-	inputs := input.Load(16, false).ToDoubleStringGroupedArray()
+	inputs := input.Load("16").ToDoubleStringGroupedArray()
 	// get fields
 	var fields []field
 	for _, line := range inputs[0] {

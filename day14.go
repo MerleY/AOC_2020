@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-type Instruction struct {
+type MaskedData struct {
 	mask string
 	data []pair
 }
@@ -29,7 +29,7 @@ func reverse(s string) string {
 	return string(rns)
 }
 
-func (i Instruction) update(memory map[uint64]uint64) {
+func (i MaskedData) update(memory map[uint64]uint64) {
 	for _, pair := range i.data {
 		mask1, err := strconv.ParseUint(strings.Replace(i.mask, "X", "0", -1), 2, 64)
 		mask2, err2 := strconv.ParseUint(strings.Replace(i.mask, "X", "1", -1), 2, 64)
@@ -42,7 +42,7 @@ func (i Instruction) update(memory map[uint64]uint64) {
 	}
 }
 
-func (i Instruction) update2(memory map[uint64]uint64) {
+func (i MaskedData) update2(memory map[uint64]uint64) {
 	for _, pair := range i.data {
 		mask1, err := strconv.ParseUint(strings.Replace(i.mask, "X", "0", -1), 2, 64)
 		if err != nil {
@@ -67,9 +67,9 @@ func (i Instruction) update2(memory map[uint64]uint64) {
 	}
 }
 
-func main() {
+func day14() {
 	start := time.Now()
-	inputs := input.Load(14).ToStringArray()
+	inputs := input.Load("14").ToStringArray()
 	instructions := convertInputToMaskAndMemory(inputs)
 
 	// part 1
@@ -98,15 +98,15 @@ func main() {
 	fmt.Println("Execution duration: " + time.Now().Sub(start).String())
 }
 
-func convertInputToMaskAndMemory(inputs []string) []Instruction {
-	var instructions []Instruction
-	var instruc = Instruction{}
+func convertInputToMaskAndMemory(inputs []string) []MaskedData {
+	var instructions []MaskedData
+	var instruc = MaskedData{}
 	for _, line := range inputs {
 		var splits = strings.Split(line, "=")
 		if strings.Contains(splits[0], "mask") {
 			if instruc.mask != "" {
 				instructions = append(instructions, instruc)
-				instruc = Instruction{}
+				instruc = MaskedData{}
 			}
 			instruc.mask = strings.Trim(splits[1], " ")
 		} else {
