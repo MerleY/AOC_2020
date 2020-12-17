@@ -7,6 +7,6 @@ import (
 
 func main() {
 	start := time.Now()
-	day12()
+	day17()
 	fmt.Println("Execution duration: " + time.Now().Sub(start).String())
 }
