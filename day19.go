@@ -3,14 +3,16 @@ package main
 import (
 	"aoc/input"
 	"fmt"
+	"log"
+	"regexp"
 	"strconv"
 	"strings"
 )
 
 type Rule struct {
-	sets           [][]int
-	hardcoded      bool
-	hardcodedValue string
+	sets      [][]int
+	hardcoded bool
+	value     string
 }
 
 func day19() {
@@ -34,7 +36,7 @@ func day19() {
 
 		if strings.Contains(parts[1], "\"") {
 			rules[numRule].hardcoded = true
-			rules[numRule].hardcodedValue = strings.Trim(parts[1], "\" ")
+			rules[numRule].value = strings.Trim(parts[1], "\" ")
 		} else {
 			sets := strings.Split(parts[1], "|")
 			rules[numRule].hardcoded = false
@@ -53,15 +55,110 @@ func day19() {
 
 	// part 1
 	nbValid := 0
-	for _, m := range messages {
-		if matchRule(rules, 0, m) {
-			nbValid++
+	for i := 0; i < len(messages); i++ {
+		layer := [][]int{[]int{0}}
+		fmt.Printf("\n%v\n", messages[i])
+		for {
+			layer = buildNewLayer(layer, rules)
+			layer = cleanLayer(rules, layer, messages[i])
+			if len(layer) == 0 {
+				fmt.Printf("invalid\n")
+				break
+			}
+			if oneMatch(rules, layer) {
+				nbValid++
+				fmt.Printf("valid\n")
+				break
+			}
 		}
 	}
+
 	fmt.Printf("Star 1: %v\n", nbValid)
 }
 
-func matchRule(rules map[int]*Rule, ruleNumber int, message string) bool {
-	rule0 := rules[ruleNumber]
+func buildNewLayer(layer [][]int, rules map[int]*Rule) [][]int {
+	var nextLayer [][]int
+	for _, candidate := range layer {
+		newPossibilities := developCandidate(rules, candidate)
+		nextLayer = append(nextLayer, newPossibilities...)
+	}
+	return nextLayer
+}
 
+func oneMatch(rules map[int]*Rule, layer [][]int) bool {
+	for _, candidate := range layer {
+		hardCoded := true
+		for _, n := range candidate {
+			if !rules[n].hardcoded {
+				hardCoded = false
+				break
+			}
+		}
+		if hardCoded {
+			return true
+		}
+	}
+
+	return false
+}
+
+func cleanLayer(rules map[int]*Rule, layer [][]int, message string) [][]int {
+	cleanedLayer := make([][]int, 0)
+	for _, candidate := range layer {
+		regex := buildRegex(rules, candidate)
+		matched, err := regexp.MatchString(regex, message)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if matched {
+			cleanedLayer = append(cleanedLayer, candidate)
+		}
+	}
+
+	return cleanedLayer
+}
+
+func buildRegex(rules map[int]*Rule, candidate []int) string {
+	regex := `^`
+	for _, n := range candidate {
+		if rules[n].hardcoded {
+			regex = regex + rules[n].value
+		} else {
+			regex = regex + `[ab]+`
+		}
+	}
+	regex = regex + `$`
+
+	return regex
+}
+
+func developCandidate(rules map[int]*Rule, candidate []int) [][]int {
+	newCandidates := make([][]int, 0)
+	for _, num := range candidate {
+		newCandidatesTemp := make([][]int, 0)
+		if rules[num].hardcoded == false {
+			if len(newCandidates) == 0 {
+				for _, set := range rules[num].sets {
+					newCandidatesTemp = append(newCandidatesTemp, set)
+				}
+			} else {
+				for _, can := range newCandidates {
+					for _, set := range rules[num].sets {
+						newCandidatesTemp = append(newCandidatesTemp, append(can, set...))
+					}
+				}
+			}
+		} else {
+			if len(newCandidates) == 0 {
+				newCandidatesTemp = append(newCandidatesTemp, []int{num})
+			} else {
+				for _, can := range newCandidates {
+					newCandidatesTemp = append(newCandidatesTemp, append(can, num))
+				}
+			}
+		}
+		newCandidates = newCandidatesTemp
+	}
+
+	return newCandidates
 }
