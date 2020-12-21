@@ -10,6 +10,17 @@ func StringIn(a string, list []string) bool {
 	return false
 }
 
+func CountString(a string, list []string) int {
+	count := 0
+	for _, b := range list {
+		if b == a {
+			count++
+		}
+	}
+
+	return count
+}
+
 func IntIn(a int, list []int) bool {
 	for _, b := range list {
 		if b == a {
