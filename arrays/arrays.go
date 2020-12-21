@@ -60,3 +60,14 @@ func Index(list []string, elem string) int {
 	}
 	return -1
 }
+
+func unique(l []string) []string {
+    l2 := []string{}
+    for _, s := range l {
+        if !StringIn(s, l2) {
+            l2 = append(l2, s)
+        }
+    }
+
+    return l2
+}
