@@ -62,12 +62,12 @@ func day19() {
 			layer = buildNewLayer(layer, rules)
 			layer = cleanLayer(rules, layer, messages[i])
 			if len(layer) == 0 {
-				fmt.Printf("invalid\n")
+				// fmt.Printf("invalid\n")
 				break
 			}
 			if oneMatch(rules, layer) {
 				nbValid++
-				fmt.Printf("valid\n")
+				// fmt.Printf("valid\n")
 				break
 			}
 		}
@@ -95,6 +95,7 @@ func oneMatch(rules map[int]*Rule, layer [][]int) bool {
 			}
 		}
 		if hardCoded {
+			fmt.Printf("can: %v\n", candidate)
 			return true
 		}
 	}

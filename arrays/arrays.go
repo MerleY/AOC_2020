@@ -61,13 +61,35 @@ func Index(list []string, elem string) int {
 	return -1
 }
 
-func unique(l []string) []string {
-    l2 := []string{}
-    for _, s := range l {
-        if !StringIn(s, l2) {
-            l2 = append(l2, s)
-        }
-    }
+func Unique(l []string) []string {
+	l2 := []string{}
+	for _, s := range l {
+		if !StringIn(s, l2) {
+			l2 = append(l2, s)
+		}
+	}
 
-    return l2
+	return l2
+}
+
+func Reverse(a []byte) []byte {
+	rev := []byte{}
+	for i := len(a) - 1; i > 0; i-- {
+		rev = append(rev, a[i])
+	}
+
+	return rev
+}
+
+func Equal(a []byte, b []byte) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := 0; i < len(a)-1; i++ {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
 }
