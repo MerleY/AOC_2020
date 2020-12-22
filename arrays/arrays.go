@@ -21,6 +21,15 @@ func CountString(a string, list []string) int {
 	return count
 }
 
+func DoubleIntIn(a []int, list [][]int) bool {
+	for _, b := range list {
+		if EqualInt(b, a) {
+			return true
+		}
+	}
+	return false
+}
+
 func IntIn(a int, list []int) bool {
 	for _, b := range list {
 		if b == a {
@@ -85,18 +94,31 @@ func Unique(l []string) []string {
 
 func Reverse(a []byte) []byte {
 	rev := []byte{}
-	for i := len(a) - 1; i > 0; i-- {
+	for i := len(a) - 1; i >= 0; i-- {
 		rev = append(rev, a[i])
 	}
 
 	return rev
 }
 
+func EqualInt(a []int, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := 0; i < len(a); i++ {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 func Equal(a []byte, b []byte) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for i := 0; i < len(a)-1; i++ {
+	for i := 0; i < len(a); i++ {
 		if a[i] != b[i] {
 			return false
 		}
