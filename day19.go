@@ -57,17 +57,17 @@ func day19() {
 	nbValid := 0
 	for i := 0; i < len(messages); i++ {
 		layer := [][]int{[]int{0}}
-		fmt.Printf("\n%v\n", messages[i])
 		for {
 			layer = buildNewLayer(layer, rules)
 			layer = cleanLayer(rules, layer, messages[i])
 			if len(layer) == 0 {
-				// fmt.Printf("invalid\n")
+				//fmt.Printf("invalid\n")
 				break
 			}
 			if oneMatch(rules, layer) {
 				nbValid++
-				// fmt.Printf("valid\n")
+				fmt.Printf("%v\n", messages[i])
+				fmt.Printf("valid\n")
 				break
 			}
 		}
