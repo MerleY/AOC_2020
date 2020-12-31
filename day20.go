@@ -10,7 +10,7 @@ import (
 )
 
 func day20() {
-	input := input.Load("20").ToDoubleStringGroupedArray()
+	input := input.Load("20-test").ToDoubleStringGroupedArray()
 	re := regexp.MustCompile(`^Tile\s(\d+):`)
 	allPictures := []picture{}
 	for _, lines := range input {
@@ -38,11 +38,10 @@ func day20() {
 			if i == j {
 				continue
 			}
-			if p.fitAll(p2) {
+			if v, _ := p.fit(&p2); v == true {
 				fitCount++
 			}
 		}
-		fmt.Printf("Image %v, fits: %v\n", p.id, fitCount)
 		if fitCount == 2 {
 			productAngle *= p.id
 		}
@@ -50,28 +49,125 @@ func day20() {
 
 	fmt.Printf("Star 1: %v\n", productAngle)
 
-	bigPic := BigPicture{content: make(map[int][int]*picture)}
+	bigPic := BigPicture{content: make(map[int]map[int]*picture)}
+	bigPic.content[0] = make(map[int]*picture)
 	for {
-		for _, p := range allPictures {
-			bigPic.place(p)
+		if len(allPictures) == 0 {
+			break
 		}
-	}
-
-}
-
-type BiGPicture struct {
-	content map[int]map[int]*picture
-}
-
-func (bp *BigPicture) place(pic picture) []int {
-	if len(bp.content) == 0 {
-		bp[0][0] = &p
-	} else {
-		for x, my := range bp.content {
-			for y, p := range my {
+		for i, p := range allPictures {
+			if bigPic.place(&p) {
+				allPictures = append(allPictures[:i], allPictures[i+1:]...)
+				break
 			}
 		}
 	}
+	trimPicture := bigPic.generateTrimPicture()
+	for _, line := range trimPicture {
+		for _, c := range line {
+			fmt.Print(string(c))
+		}
+		fmt.Print("\n")
+	}
+	// orientation not kept inside bigPicture
+	fmt.Printf("Star 2: %v\n", bigPic)
+}
+
+type BigPicture struct {
+	content map[int]map[int]*picture
+}
+
+func (bp *BigPicture) generateTrimPicture() [][]byte {
+	globImage := [][]byte{}
+	minX := 0
+	maxX := 0
+	minY := 0
+	maxY := 0
+	for x, my := range bp.content {
+		if x < minX {
+			minX = x
+		}
+		if x > maxX {
+			maxX = x
+		}
+		for y, p := range my {
+			p.trim()
+			if y < minY {
+				minY = y
+			}
+			if y > maxY {
+				maxY = y
+			}
+		}
+	}
+	for y := minY; y <= maxY; y++ {
+		for x := minX; x <= maxX; x++ {
+			p := bp.content[x][y]
+			if x == minX {
+				for _, line := range p.pixels {
+					globImage = append(globImage, line)
+				}
+			} else {
+				for i, line := range p.pixels {
+					globImage[i+len(p.pixels)*(y-minY)] = append(globImage[i+len(p.pixels)*(y-minY)], line...)
+				}
+			}
+		}
+	}
+	return globImage
+}
+
+func (bp *BigPicture) place(pic *picture) bool {
+	if len(bp.content[0]) == 0 {
+		bp.content[0][0] = pic
+		return true
+	} else {
+		for x, my := range bp.content {
+			for y, p := range my {
+				if f, w := p.fit(pic); f == true {
+					if w == "t" {
+						if _, ok := bp.content[x][y-1]; ok {
+							log.Fatal("case already used")
+						}
+						if bp.content[x] == nil {
+							bp.content[x] = make(map[int]*picture)
+						}
+						bp.content[x][y-1] = pic
+						return true
+					} else if w == "b" {
+						if _, ok := bp.content[x][y+1]; ok {
+							log.Fatal("case already used")
+						}
+						if bp.content[x] == nil {
+							bp.content[x] = make(map[int]*picture)
+						}
+						bp.content[x][y+1] = pic
+						return true
+					} else if w == "l" {
+						if _, ok := bp.content[x-1][y]; ok {
+							log.Fatal("case already used")
+						}
+						if bp.content[x-1] == nil {
+							bp.content[x-1] = make(map[int]*picture)
+						}
+						bp.content[x-1][y] = pic
+						return true
+					} else if w == "r" {
+						if _, ok := bp.content[x+1][y]; ok {
+							log.Fatal("case already used")
+						}
+						if bp.content[x+1] == nil {
+							bp.content[x+1] = make(map[int]*picture)
+						}
+						bp.content[x+1][y] = pic
+						return true
+					}
+				}
+			}
+		}
+	}
+
+	return false
 }
 
 type picture struct {
@@ -80,54 +176,34 @@ type picture struct {
 	orient int
 }
 
-func (p *picture) fitAll(p2 picture) bool {
-	for i := 0; i < 8; i++ {
-		if arrays.Equal(p.getBottom(), p2.getTop()) || arrays.Equal(p.getTop(), p2.getBottom()) || arrays.Equal(p.getLeft(), p2.getRight()) || arrays.Equal(p.getRight(), p2.getLeft()) {
-			return true
-		}
-		p2.flip()
-	}
-	return false
-}
-
-func (p *picture) fitRight(p2 *picture) bool {
-	for i := 0; i < 8; i++ {
-		if arrays.Equal(p.getRight(), p2.getLeft()) {
-			return true
-		}
-		p2.flip()
-	}
-	return false
-}
-
-func (p *picture) fitLeft(p2 *picture) bool {
-	for i := 0; i < 8; i++ {
-		if arrays.Equal(p.getLeft(), p2.getRight()) {
-			return true, i
-		}
-		p2.flip()
-	}
-	return false, 0
-}
-
-func (p *picture) fitTop(p2 *picture) bool {
-	for i := 0; i < 8; i++ {
-		if arrays.Equal(p.getTop(), p2.getBottom()) {
-			return true
-		}
-		p2.flip()
-	}
-	return false
-}
-
-func (p *picture) fitBottom(p2 *picture) bool {
+func (p *picture) fit(p2 *picture) (bool, string) {
 	for i := 0; i < 8; i++ {
 		if arrays.Equal(p.getBottom(), p2.getTop()) {
-			return true
+			return true, "b"
+		}
+		if arrays.Equal(p.getTop(), p2.getBottom()) {
+			return true, "t"
+		}
+		if arrays.Equal(p.getLeft(), p2.getRight()) {
+			return true, "l"
+		}
+		if arrays.Equal(p.getRight(), p2.getLeft()) {
+			return true, "r"
 		}
 		p2.flip()
 	}
-	return false
+	return false, ""
+}
+
+func (p *picture) trim() {
+	newPixels := [][]byte{}
+	for i, line := range p.pixels {
+		if i != 0 && i != len(p.pixels)-1 {
+			newLine := line[1 : len(line)-1]
+			newPixels = append(newPixels, newLine)
+		}
+	}
+	p.pixels = newPixels
 }
 
 func (p *picture) flip() {
